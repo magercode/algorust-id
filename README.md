@@ -131,3 +131,6 @@ Kontribusi sangat terbuka:
 2. Tambahkan test untuk setiap perubahan algoritma.
 3. Pastikan `cargo test` lulus.
 4. Buat PR dengan deskripsi teknis singkat dan terukur.
+
+## 10. Acknowledgement
+- [Rust-Algos-CN](https://github.com/rustcn-org/rust-algos)
