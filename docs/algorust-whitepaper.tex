@@ -1,0 +1,280 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[indonesian]{babel}
+\usepackage{hyperref}
+\usepackage[a4paper,margin=2.5cm]{geometry}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{float}
+\usepackage{tikz}
+\usepackage{amsmath}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric}
+\usepackage{xcolor}
+\usepackage{listings}
+
+\lstdefinelanguage{Rust}{
+  morekeywords={as,break,const,continue,crate,else,enum,extern,false,fn,for,if,impl,in,let,loop,match,mod,move,mut,pub,ref,return,self,Self,static,struct,super,trait,true,type,unsafe,use,where,while,async,await,dyn},
+  sensitive=true,
+  morecomment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]",
+}
+
+\lstdefinestyle{ruststyle}{
+  language=Rust,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue!70!black}\bfseries,
+  commentstyle=\color{green!40!black}\itshape,
+  stringstyle=\color{orange!70!black},
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  numbersep=8pt,
+  breaklines=true,
+  frame=single,
+  showstringspaces=false,
+  tabsize=2,
+  captionpos=b
+}
+
+\title{ALGORUST: Dokumen Teknis Pembelajaran Algoritma, P2P, dan Kriptografi Dasar Berbasis Rust}
+\author{MagerCode Team \\ \small \texttt{contact@rayhex.biz.id}}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section{Ringkasan Eksekutif}
+ALGORUST adalah kerangka belajar teknis berbahasa Indonesia yang dirancang untuk menjembatani teori
+algoritma dengan implementasi perangkat lunak nyata menggunakan Rust. Dokumen ini menjelaskan
+arah pembelajaran, struktur modul, metodologi evaluasi, serta praktik keamanan minimum
+yang perlu dipahami peserta.
+
+\section{Sejarah dan Filosofi Bahasa Rust}
+Bahasa pemrograman Rust pertama kali dikembangkan oleh Mozilla Research sebagai proyek pribadi
+Graydon Hoare pada tahun 2006, dan secara resmi diumumkan oleh Mozilla pada tahun 2010.
+Rust dirancang untuk menjadi bahasa sistem yang aman secara memori (\textit{memory-safe}) tanpa
+mengorbankan kecepatan atau membutuhkan pengumpul sampah (\textit{garbage collector}).
+
+Filosofi utama Rust adalah memberikan kontrol tingkat rendah seperti C/C++, namun dengan jaminan
+keamanan memori melalui sistem kepemilikan (\textit{ownership}) dan pemeriksaan pinjaman (\textit{borrow checker}).
+Sejak rilis stabil pertama pada tahun 2015, Rust tumbuh pesat dan dinobatkan sebagai bahasa
+``paling dicintai'' dalam survei Stack Overflow selama bertahun-tahun. Saat ini Rust digunakan
+secara luas di berbagai domain, termasuk pengembangan sistem operasi, mesin browser, perangkat
+tertanam, dan tentu saja aplikasi jaringan terdesentralisasi seperti blockchain dan protokol P2P.
+
+Keandalan dan kecepatan Rust menjadikannya pilihan tepat untuk mengimplementasikan algoritma
+kriptografi dan protokol jaringan yang membutuhkan ketepatan tinggi dan performa maksimal.
+
+\section{Visi dan Tujuan}
+\begin{itemize}
+  \item Menyediakan jalur belajar terstruktur dari tingkat dasar hingga menengah-lanjut.
+  \item Menjelaskan keputusan desain algoritma berdasarkan kompleksitas waktu, ruang, dan keterbacaan kode.
+  \item Membentuk kebiasaan rekayasa perangkat lunak yang terukur melalui pengujian, analisis, dan refleksi solusi.
+  \item Menyediakan materi yang relevan untuk kelas rekayasa perangkat lunak maupun pembelajaran mandiri.
+\end{itemize}
+
+\section{Ruang Lingkup Pembelajaran}
+\subsection{Modul 1: Algoritma Fundamental}
+Modul ini membahas pengurutan, pencarian, penelusuran graf, dan pemrograman dinamis sebagai fondasi
+berpikir komputasional yang efisien.
+
+\begin{table}[H]
+\centering
+\caption{Ringkasan Topik Algoritma Fundamental}
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}p{3cm} >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}p{3cm}}
+\toprule
+Kategori & Materi & Kompleksitas Kunci \\
+\midrule
+Sorting & Bubble, Selection, Insertion, Merge, Quick Sort & Perbandingan $O(n^2)$ vs $O(n \log n)$ \\
+Pencarian & Linear Search, Binary Search & Trade-off data terurut dan tidak terurut \\
+Graf & BFS, DFS, Dijkstra & Penelusuran $O(V+E)$ dan lintasan terpendek \\
+Pemrograman Dinamis & Knapsack, Coin Change & Optimasi submasalah dan penyimpanan hasil antara (memoization) \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Rumus rekursif untuk kompleksitas Merge Sort adalah:
+\[
+T(n) = 2T\left(\frac{n}{2}\right) + O(n)
+\]
+yang menghasilkan solusi \(T(n) = O(n \log n)\).
+
+\subsection{Modul 2: Algoritma Jaringan P2P}
+% ============= TAMBAHAN: SEJARAH DAN KONSEP P2P =============
+Jaringan \textit{Peer-to-Peer} (P2P) pertama kali dikenal luas melalui aplikasi berbagi berkas
+seperti Napster (1999) dan BitTorrent (2001). Konsep utamanya adalah setiap node (rekan)
+dapat berperan sebagai klien sekaligus server, sehingga tidak bergantung pada server pusat.
+Hal ini memberikan ketahanan dan skalabilitas tinggi. Perkembangan terbaru teknologi blockchain
+seperti Bitcoin dan Ethereum juga menggunakan prinsip P2P untuk mencapai konsensus terdesentralisasi.
+
+Fokus utama modul ini adalah simulasi penyebaran pesan dan pengambilan keputusan antar node
+secara terdesentralisasi.
+
+\begin{table}[H]
+\centering
+\caption{Skenario Simulasi P2P pada ALGORUST}
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}p{3cm} >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}p{3cm}}
+\toprule
+Skenario & Deskripsi & Metrik Evaluasi \\
+\midrule
+Penyiaran Gosip & Tiap node meneruskan pesan ke beberapa rekan acak & Latensi propagasi \\
+Pemeringkatan Rekan & Node memberi bobot reputasi pada rekan & Stabilitas jaringan \\
+Fault Injection & Simulasi node gagal atau lambat & Ketahanan protokol \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Dalam protokol gosip, probabilitas sebuah node menerima pesan setelah \(k\) putaran dapat dinyatakan dengan:
+\[
+P_{\text{terima}} \approx 1 - (1 - p)^{k \cdot d}
+\]
+dengan \(p\) adalah probabilitas forwarding dan \(d\) adalah derajat rata-rata node.
+
+\subsection{Modul 3: Kriptografi Dasar}
+Kriptografi telah digunakan sejak zaman Romawi dengan cipher sederhana seperti Caesar Cipher.
+Perkembangan pesat terjadi pada abad ke-20, terutama saat Perang Dunia II dengan mesin Enigma.
+Era modern ditandai dengan ditemukannya kriptografi kunci publik oleh Diffie dan Hellman (1976)
+yang memungkinkan pertukaran kunci aman melalui kanal tidak aman. Saat ini kriptografi menjadi
+fondasi keamanan digital, termasuk dalam mata uang kripto dan protokol komunikasi.
+
+Modul ini menekankan pemahaman konsep inti keamanan informasi melalui implementasi sederhana
+yang mudah dipelajari.
+
+\begin{table}[H]
+\centering
+\caption{Modul Kriptografi Dasar}
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}p{3.2cm} >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}p{2.8cm}}
+\toprule
+Modul & Tujuan Pembelajaran & Output \\
+\midrule
+Cipher Klasik & Memahami transformasi teks asli ke teks sandi sederhana & Enkripsi dan dekripsi dasar \\
+Diffie-Hellman & Memahami pertukaran kunci di kanal publik & Rahasia bersama \\
+Pohon Merkle & Verifikasi integritas data berbasis hash & Hash akar dan bukti keanggotaan \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Protokol Diffie-Hellman menggunakan eksponensiasi modular. Misalkan dua pihak setuju pada bilangan prima \(p\) dan generator \(g\). Masing-masing memilih rahasia \(a\) dan \(b\), lalu mengirim:
+\[
+A = g^a \mod p, \quad B = g^b \mod p
+\]
+Rahasia bersama dihitung sebagai:
+\[
+K = B^a \mod p = A^b \mod p = g^{ab} \mod p
+\]
+
+Sedangkan pohon Merkle menggunakan fungsi hash \(H(\cdot)\). Hash akar dihitung dengan menggabungkan hash anak-anak:
+\[
+H_{\text{root}} = H\big( H_{\text{kiri}} \parallel H_{\text{kanan}} \big)
+\]
+
+\section{Bagan Alir Pembelajaran Terstruktur}
+\noindent
+Diagram berikut menggambarkan siklus belajar adaptif: peserta dapat mengulang modul ketika
+indikator pemahaman belum tercapai, sehingga proses belajar tetap bertahap dan terukur.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+  node distance=1.6cm,
+  block/.style={rectangle, rounded corners, draw=black, fill=blue!8, minimum width=5cm, minimum height=0.9cm, align=center},
+  decision/.style={diamond, draw=black, fill=orange!12, aspect=2, align=center, inner sep=1pt},
+  line/.style={-{Latex[length=2mm]}, thick}
+]
+\node[block] (start) {Mulai Belajar ALGORUST};
+\node[block, below=of start] (fund) {Pelajari Algoritma Fundamental};
+\node[decision, below=of fund] (check1) {Sudah paham\\kompleksitas?};
+\node[block, below=of check1] (p2p) {Lanjut ke Modul P2P};
+\node[block, below=of p2p] (crypto) {Lanjut ke Modul Kriptografi};
+\node[decision, below=of crypto] (check2) {Semua latihan\\lulus?};
+\node[block, below=of check2] (end) {Selesai dan Tinjau Portofolio Solusi};
+\node[block, right=2.8cm of check1] (repeat1) {Ulangi materi\\dan latihan};
+\node[block, right=2.8cm of check2] (repeat2) {Perbaiki solusi\\latihan};
+
+\draw[line] (start) -- (fund);
+\draw[line] (fund) -- (check1);
+\draw[line] (check1) -- node[left]{Ya} (p2p);
+\draw[line] (p2p) -- (crypto);
+\draw[line] (crypto) -- (check2);
+\draw[line] (check2) -- node[left]{Ya} (end);
+\draw[line] (check1.east) -- node[above]{Tidak} (repeat1.west);
+\draw[line] (repeat1.south) |- (fund.east);
+\draw[line] (check2.east) -- node[above]{Tidak} (repeat2.west);
+\draw[line] (repeat2.north) |- (crypto.east);
+\end{tikzpicture}
+\caption{Bagan alir jalur pembelajaran ALGORUST}
+\end{figure}
+
+\section{Contoh Implementasi Rust}
+Contoh berikut menunjukkan implementasi BFS yang ringkas dan mudah diikuti, dengan format
+penyorotan sintaks khusus Rust.
+
+\begin{lstlisting}[style=ruststyle,caption={Contoh BFS sederhana di Rust}]
+use std::collections::VecDeque;
+
+fn bfs(graph: &[Vec<usize>], start: usize) -> Vec<usize> {
+    let mut visited = vec![false; graph.len()];
+    let mut order = Vec::new();
+    let mut queue = VecDeque::new();
+
+    visited[start] = true;
+    queue.push_back(start);
+
+    while let Some(node) = queue.pop_front() {
+        order.push(node);
+        for &next in &graph[node] {
+            if !visited[next] {
+                visited[next] = true;
+                queue.push_back(next);
+            }
+        }
+    }
+
+    order
+}
+\end{lstlisting}
+
+Berikut adalah contoh implementasi Caesar cipher di Rust untuk mengenkripsi teks:
+
+\begin{lstlisting}[style=ruststyle,caption={Caesar cipher di Rust}]
+fn caesar_encrypt(plain: &str, shift: u8) -> String {
+    plain.chars()
+        .map(|c| {
+            if c.is_ascii_alphabetic() {
+                let first = if c.is_ascii_lowercase() { b'a' } else { b'A' };
+                let offset = (c as u8 - first + shift) % 26;
+                (first + offset) as char
+            } else {
+                c
+            }
+        })
+        .collect()
+}
+\end{lstlisting}
+
+\section{Metodologi Evaluasi}
+Pendekatan evaluasi dirancang untuk memastikan pemahaman konsep sekaligus kualitas implementasi:
+\begin{itemize}
+  \item Uji unit (\textit{unit test}) untuk validasi ketepatan keluaran.
+  \item Latihan bertahap berbasis tingkat kesulitan.
+  \item Analisis kompleksitas waktu dan ruang pada setiap solusi.
+  \item Tinjauan kualitas kode: keterbacaan, modularitas, dan penanganan kasus tepi.
+\end{itemize}
+
+\section{Prinsip Keamanan dan Batasan}
+Implementasi kriptografi dalam ALGORUST berorientasi edukasi, bukan produksi.
+Untuk penggunaan nyata, disarankan:
+\begin{itemize}
+  \item Menggunakan pustaka kriptografi standar yang telah diaudit.
+  \item Menghindari merancang algoritma kriptografi sendiri tanpa evaluasi pakar.
+  \item Menerapkan pengelolaan kunci dan audit keamanan berkala.
+\end{itemize}
+
+\section{Penutup}
+ALGORUST menempatkan pembelajaran algoritma dalam konteks rekayasa perangkat lunak modern:
+berbasis data, terukur, dan berulang. Dengan pendekatan ini, peserta tidak hanya memahami
+``cara kerja'' algoritma, tetapi juga ``kapan'' dan ``mengapa'' sebuah solusi dipilih.
+
+\end{document}
